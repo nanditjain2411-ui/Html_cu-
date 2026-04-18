@@ -1,82 +1,112 @@
 #include <stdio.h>
+#include <string.h>
 #define MAX 5
 
-int queue[MAX];
-int front = -1, rear = -1;
+// Structure for ticket
+struct Ticket {
+    int ticketNo;
+    char name[50];
+};
 
-// Enqueue (Insert)
-void enqueue(int value) {
+struct Ticket queue[MAX];
+
+int front = -1, rear = -1;
+int nextTicket = 100;  // starting ticket number
+
+// Generate Ticket
+void generateTicket() {
     if ((rear + 1) % MAX == front) {
-        printf("Queue Overflow\n");
+        printf("Queue Full! Cannot issue more tickets.\n");
         return;
     }
 
-    if (front == -1) {  // First element
+    struct Ticket t;
+    t.ticketNo = nextTicket++;
+
+    printf("Enter customer name: ");
+    scanf(" %[^\n]", t.name);  // takes full name
+
+    if (front == -1) {
         front = rear = 0;
     } else {
         rear = (rear + 1) % MAX;
     }
-    queue[rear] = value;
-    printf("Inserted: %d\n", value);
+
+    queue[rear] = t;
+
+    printf("✅ Ticket Issued Successfully!\n");
+    printf("Ticket No: %d | Name: %s\n", t.ticketNo, t.name);
 }
-// Dequeue (Delete)
-void dequeue() {
+
+// Serve Customer
+void serveCustomer() {
     if (front == -1) {
-        printf("Queue Underflow\n");
+        printf("No customers in queue.\n");
         return;
     }
-    printf("Deleted: %d\n", queue[front]);
-    if (front == rear) {  // Only one element
+
+    struct Ticket t = queue[front];
+
+    printf("🎯 Now Serving...\n");
+    printf("Ticket No: %d | Name: %s\n", t.ticketNo, t.name);
+
+    if (front == rear) {
         front = rear = -1;
     } else {
         front = (front + 1) % MAX;
     }
 }
+
 // Display Queue
-void display() {
+void displayQueue() {
     if (front == -1) {
-        printf("Queue is empty\n");
+        printf("Queue is empty.\n");
         return;
     }
+
+    printf("\n📋 Waiting List:\n");
+
     int i = front;
-    printf("Queue elements: ");
     while (1) {
-        printf("%d ", queue[i]);
+        printf("Ticket %d - %s\n", queue[i].ticketNo, queue[i].name);
         if (i == rear)
             break;
         i = (i + 1) % MAX;
     }
-    printf("\n");
 }
+
 // Main Function
 int main() {
-    int choice, value;
+    int choice;
+
     while (1) {
-        printf("\n--- Circular Queue Menu ---\n");
-        printf("1. Enqueue\n2. Dequeue\n3. Display\n4. Exit\n");
-        printf("Enter your choice: ");
+        printf("\n===== Ticket Management System =====\n");
+        printf("1. Generate Ticket\n");
+        printf("2. Serve Customer\n");
+        printf("3. Display Waiting List\n");
+        printf("4. Exit\n");
+        printf("Enter choice: ");
         scanf("%d", &choice);
 
         switch (choice) {
             case 1:
-                printf("Enter value: ");
-                scanf("%d", &value);
-                enqueue(value);
+                generateTicket();
                 break;
 
             case 2:
-                dequeue();
+                serveCustomer();
                 break;
 
             case 3:
-                display();
+                displayQueue();
                 break;
 
             case 4:
+                printf("Exiting system...\n");
                 return 0;
 
             default:
-                printf("Invalid choice\n");
+                printf("Invalid choice!\n");
         }
     }
 }
